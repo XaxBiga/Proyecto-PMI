@@ -11,7 +11,7 @@ void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente);
 void MostrarTodosLosTurnosFecha(List_of_Turno listaD_Turno , int Mes);
 void ModificarRalizadoTurno(List_of_Turno *ListaTurno,List_of_Cliente ListaCliente, int idClienteModificar);
 void mostrar_turno_cliente(List_of_Turno t, List_of_Cliente c, char clbuscar[]);
-void ModificarLaCantidadTratamiento(List_of_Cliente *ListaDeCliente,List_of_Turno *listaDeTurno, int idClienteModificar);
+void ModificarLaCantidadTratamiento(List_of_Cliente *ListaDeCliente, int idClienteModificar);
 void busca_turnos (List_of_Turno ListaDeTurno,List_of_Cliente listaDeCliente, int idbuscar);
 void mostrar_todos_los_turnos (List_of_Turno *l);
 void modificar_pago (List_of_Turno *l,List_of_Cliente c,int id);
@@ -81,43 +81,49 @@ int main (){
                 mostrar_todos_los_turnos(&ListaDeTurno);
             break;
             case 8:
-                /*printf ("ingrese el DNI para cambiar la cantidad de tratamiento\n");
-                scanf("%d", &idbuscar);
-                if (isemptyC(ListaDeCliente)){
-                    printf ("la lista de turno esta vacia\n");
-                    return ;
-                }
+            printf("Ingrese el DNI del cliente para la modificación de la cantidad de tratamiento\n");
+            int ModCantTratamiento, CantidadTratamientoNuevo;
+            char confirmacion;
+            scanf("%d", &ModCantTratamiento);
 
-                resetC(&ListaDeCliente);
-                TDA_Cliente ClienteAux ;
-                while (!isOosC(ListaDeCliente)){
-                    if(busca_turno_idcliente(ListaDeCliente, idbuscar)==1){
-
-                    ClienteAux = copyyC(ListaDeCliente);
-                do {
-                    printf("¿Esta seguro que quiere modificar la cantidad de tratamientos? (S/n)\n");
-                    scanf(" %c", &confirmacion);
-               } while (confirmacion != 'S' && confirmacion != 's' && confirmacion != 'N' && confirmacion != 'n');
-
-                if (confirmacion == 'S' || confirmacion == 's') {
-                    printf ("aca estamos\n");
-                    printf("Ingrese la nueva cantidad de tratamientos:\n");
-                    scanf("%d", &CantidadTratamientoNuevo);
-                    set_CantidadTratamientoss(&ClienteAux, CantidadTratamientoNuevo);
-                    printf ("la cantidad de tratamientos son musu , tobi y gabi: %d",get_CantidadTratamientoss(&ClienteAux));
-                    supressC(&ListaDeCliente);
-                    inserteC(&ListaDeCliente,ClienteAux);
-                    printf("Modificacion exitosa\n");
-                } else {
-                    printf("Modificacion cancelada\n");
-                    return ;
-                }
-            }else {
-                printf ("no se como se llama\n");
+            if (isemptyC(ListaDeCliente)) {
+                printf("La lista está vacía\n");
+                return 0;  
             }
-            forwards(&ListaDeCliente);
-            }*/
 
+            resetC(&ListaDeCliente);
+
+            TDA_Cliente ClienteAux;
+            while (!isOosC(ListaDeCliente)) {
+                ClienteAux = copyyC(ListaDeCliente);  // Copia el cliente actual al inicio del bucle
+                
+                // Compara el IdCliente
+                if (get_IdClientes(&ClienteAux) == ModCantTratamiento) {
+
+                    do {
+                        printf("¿Está seguro que quiere realizar la modificación de cantidad de tratamientos? (S/n): ");
+                        scanf(" %c", &confirmacion);
+                    } while (confirmacion != 'S' && confirmacion != 's' && 
+                            confirmacion != 'N' && confirmacion != 'n');
+
+                    if (confirmacion == 'S' || confirmacion == 's') {
+                        printf("Ingrese la cantidad de tratamientos que quiere modificar: ");
+                        scanf("%d", &CantidadTratamientoNuevo);
+                        set_CantidadTratamientoss(&ClienteAux, CantidadTratamientoNuevo);
+                        
+                        supressC(&ListaDeCliente); 
+                        inserteC(&ListaDeCliente, ClienteAux);  
+                        printf("Modificación exitosa\n");
+                        break;  
+                    } else {
+                        printf("Se negó la realización de la modificación\n");
+                        break; 
+                    }
+                }
+
+                // Avanza al siguiente cliente
+                forwardsC(&ListaDeCliente);  
+            }
             break;
             case 9:
                 printf ("Ingrese porfavor el DNI para buscar para la modificacion de pago");
@@ -520,8 +526,7 @@ void mostrar_todos_los_turnos (List_of_Turno *l){
 
       }
 
-
-/// Función "9").
+/// Función "9"I).
 void modificar_pago(List_of_Turno *l,List_of_Cliente c, int id) {
     int nuevopago;
     resert(l);
