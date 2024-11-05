@@ -100,7 +100,7 @@ int main (){
                 if (get_IdClientes(&ClienteAux) == ModCantTratamiento) {
 
                     do {
-                        printf("¿Esta seguro que quiere realizar la modificación de cantidad de tratamientos? (S/n): ");
+                        printf("¿Esta seguro que quiere realizar la modificacion de cantidad de tratamientos? (S/n): ");
                         scanf(" %c", &confirmacion);
                     } while (confirmacion != 'S' && confirmacion != 's' && 
                             confirmacion != 'N' && confirmacion != 'n');
