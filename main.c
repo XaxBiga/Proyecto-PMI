@@ -81,13 +81,13 @@ int main (){
                 mostrar_todos_los_turnos(&ListaDeTurno);
             break;
             case 8:
-            printf("Ingrese el DNI del cliente para la modificación de la cantidad de tratamiento\n");
+            printf("Ingrese el DNI del cliente para la modificacion de la cantidad de tratamiento\n");
             int ModCantTratamiento, CantidadTratamientoNuevo;
             char confirmacion;
             scanf("%d", &ModCantTratamiento);
 
             if (isemptyC(ListaDeCliente)) {
-                printf("La lista está vacía\n");
+                printf("La lista está vacia\n");
                 return 0;  
             }
 
@@ -95,13 +95,12 @@ int main (){
 
             TDA_Cliente ClienteAux;
             while (!isOosC(ListaDeCliente)) {
-                ClienteAux = copyyC(ListaDeCliente);  // Copia el cliente actual al inicio del bucle
+                ClienteAux = copyyC(ListaDeCliente); 
                 
-                // Compara el IdCliente
                 if (get_IdClientes(&ClienteAux) == ModCantTratamiento) {
 
                     do {
-                        printf("¿Está seguro que quiere realizar la modificación de cantidad de tratamientos? (S/n): ");
+                        printf("¿Esta seguro que quiere realizar la modificación de cantidad de tratamientos? (S/n): ");
                         scanf(" %c", &confirmacion);
                     } while (confirmacion != 'S' && confirmacion != 's' && 
                             confirmacion != 'N' && confirmacion != 'n');
@@ -113,15 +112,14 @@ int main (){
                         
                         supressC(&ListaDeCliente); 
                         inserteC(&ListaDeCliente, ClienteAux);  
-                        printf("Modificación exitosa\n");
+                        printf("Modificacion exitosa\n");
                         break;  
                     } else {
-                        printf("Se negó la realización de la modificación\n");
+                        printf("Se nego la realizacion de la modificacion\n");
                         break; 
                     }
                 }
 
-                // Avanza al siguiente cliente
                 forwardsC(&ListaDeCliente);  
             }
             break;
