@@ -87,7 +87,7 @@ int main (){
             scanf("%d", &ModCantTratamiento);
 
             if (isemptyC(ListaDeCliente)) {
-                printf("La lista está vacia\n");
+                printf("La lista esta vacia\n");
                 return 0;  
             }
 
