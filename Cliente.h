@@ -1,12 +1,10 @@
 #ifndef CLIENTE_H_INCLUDED
 #define CLIENTE_H_INCLUDED
-
-
 #include <string.h>
 #include <stdlib.h>
 
 
-// Definición de la estructura del cliente
+// DefiniciÃ³n de la estructura del cliente
 typedef struct {
     int IdClienteDNI;
     char Nombre[31];

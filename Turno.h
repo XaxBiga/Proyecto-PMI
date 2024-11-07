@@ -1,6 +1,5 @@
 #ifndef TURNO_H_INCLUDED
 #define TURNO_H_INCLUDED
-
 #include <string.h>
 #include <stdlib.h>
 
@@ -44,16 +43,20 @@ void set_IdClientes(TDA_Turno *t, int IdClienteNuevos) {
     (*t).IdCliente = IdClienteNuevos;
 }
 
-void set_Tratamiento(TDA_Turno *t,int index ,int TipoTratamientoNuevo) {
-    for(int i = 0;i<10;i++ ){
-        if (i==index){
-            (*t).Tratamientos.TipoTratamiento[i]=TipoTratamientoNuevo;
-        }else{
-            (*t).Tratamientos.TipoTratamiento[i]=0;
+void set_Tratamiento(TDA_Turno *t,int tratamientosSeleccionados) {
+    // Inicializamos todo el arreglo con 0
+    for (int i = 0; i < 10; i++) {
+        t->Tratamientos.TipoTratamiento[i] = 0;
+    }
+
+    // Asignamos el número del tratamiento a las posiciones correspondientes
+    for (int i = 0; i < 10; i++) {
+        int tipoTratamiento = tratamientosSeleccionados;
+        if (tipoTratamiento == i) {
+            t->Tratamientos.TipoTratamiento[tipoTratamiento - 1] = tratamientosSeleccionados;
         }
     }
 }
-
 void set_PrecioTratamiento(TDA_Turno *t, int index, float PrecioTratamientoNuevo) {
     if (index >= 0 && index < 10) { // Verificar el �ndice
         (*t).Tratamientos.Precio_Tratamiento[index] = PrecioTratamientoNuevo; // Solo actualizar el tratamiento seleccionado
@@ -110,7 +113,6 @@ int get_Tratamiento(TDA_Turno *t, int index) {
         return 0;
     }
 }
-
 float get_precioTratamiento(TDA_Turno *t, int index) {
     if (index >= 0 && index < 10){
         return (*t).Tratamientos.Precio_Tratamiento[index];

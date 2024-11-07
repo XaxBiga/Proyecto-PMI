@@ -55,5 +55,4 @@ int isOosC(List_of_Cliente l) {
     return l.cursor > l.ultimo;
 }
 
-
 #endif // LISTAE_CLIENTE_H_INCLUDED
