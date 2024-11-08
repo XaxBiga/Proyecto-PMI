@@ -44,12 +44,7 @@ void set_IdClientes(TDA_Turno *t, int IdClienteNuevos) {
 }
 
 void set_Tratamiento(TDA_Turno *t,int tratamientosSeleccionados) {
-    // Inicializamos todo el arreglo con 0
-    for (int i = 0; i < 10; i++) {
-        t->Tratamientos.TipoTratamiento[i] = 0;
-    }
 
-    // Asignamos el número del tratamiento a las posiciones correspondientes
     for (int i = 0; i < 10; i++) {
         int tipoTratamiento = tratamientosSeleccionados;
         if (tipoTratamiento == i) {

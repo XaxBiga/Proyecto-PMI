@@ -11,7 +11,7 @@ typedef struct {
 } List_of_Cliente;
 
 void init_lC(List_of_Cliente *l) {
-    l->ultimo = 0;
+    l->ultimo = -1;
     l->cursor = -1;
 }
 
@@ -34,21 +34,37 @@ void resetC(List_of_Cliente *l) {
 }
 
 int inserteC(List_of_Cliente *l, TDA_Cliente NuevoCliente) {
-        for (int i = 0 ; i >= l->cursor;i--){
-            l->data[i+1] = l->data[i];
-        }
-            l->data[l->cursor] = NuevoCliente;
+        if(l->cursor == -1){
+            l->cursor++;
             l->ultimo++;
+            l->data[l->cursor] = NuevoCliente;
+
+        }else{
+            for (int i = 0 ; i >= l->cursor;i--){
+                l->data[i+1] = l->data[i];
+            }
+            l->data[0] = NuevoCliente;
+            l->cursor = 0;
+            l->ultimo ++;
+        }
             return 1;
 }
 
 int supressC(List_of_Cliente *l) {
         for (int i = l->cursor; i < l->ultimo; i++) {
-            l->data[i] = l->data[i + 1];
-        }
-        l->ultimo--;
-        return 1;
+        l->data[i] = l->data[i + 1]; // Desplazar los elementos hacia la izquierda
+    }
 
+    l->ultimo--; // Reducir el índice del último elemento
+
+    // Si la lista queda vacía, ajustar cursor a -1
+    if (l->ultimo == -1) {
+        l->cursor = -1;
+    } else if (l->cursor > l->ultimo) {
+        l->cursor = l->ultimo; // Ajustar cursor si está fuera de rango
+    }
+
+    return 1; // Eliminación exitosa
 }
 
 int isOosC(List_of_Cliente l) {

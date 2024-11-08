@@ -26,11 +26,11 @@ void set_IdCliente(TDA_Cliente *c, int IdClienteNuevo) {
 }
 
 void set_CantidadTratamientoss(TDA_Cliente *c, int CantidadDeTratamientosNuevos) {
-        c->CantidadTratamiento = CantidadDeTratamientosNuevos;
-    int totalTratamientos = 0;
-    for (int i = 0; i < 10; i++) {
-        totalTratamientos += c->CantidadTratamiento;
-    }
+    c->CantidadTratamiento = CantidadDeTratamientosNuevos;
+}
+
+void set_Nivel(TDA_Cliente *c) {
+    int totalTratamientos = c->CantidadTratamiento;
 
     if (totalTratamientos == 0) {
         c->Nivel = 0;
@@ -42,7 +42,6 @@ void set_CantidadTratamientoss(TDA_Cliente *c, int CantidadDeTratamientosNuevos)
         c->Nivel = 3;
     }
 }
-
 
 char *get_Nombres(TDA_Cliente *c) {
     return c->Nombre;

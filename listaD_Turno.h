@@ -59,7 +59,7 @@ void supress(List_of_Turno *l){
     }else{
         Nodo *eliminarr =l->cur;
         l->cur = l->cur->next;
-        free((void*)eliminarr);
+        free(eliminarr);
         l->aux->next=l->cur;
     }
 }
