@@ -19,7 +19,7 @@ void modificar_pago (List_of_Turno *l,List_of_Cliente c,int id);
 void muestraTurnoDeNorealizados(List_of_Turno listaDeTurno);
 void Eliminar_Cliente_sm_Turno (List_of_Cliente *listaCliente, List_of_Turno *listaTurno,int idCLienteEliminar);
 void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo);
-void precargarClientesDesdeArchivo(List_of_Cliente *ListaDeCliente);
+//void precargarClientesDesdeArchivo(List_of_Cliente *ListaDeCliente);
 void carga_de_un_cliente(List_of_Cliente *listaDeClientes) ;
 int main (){
 
@@ -148,7 +148,7 @@ int main (){
                 mostrar_turno_por_tratamiento(&ListaDeTurno,Tipo);
             break;
             case 14:
-                precargarClientesDesdeArchivo(&ListaDeCliente);
+                //precargarClientesDesdeArchivo(&ListaDeCliente);
             break;
             case 15:
                 MostrarTodosLosClientesDeLaLista(&ListaDeCliente);
@@ -182,6 +182,7 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
     char ApellidoMain[31];
     int CantidadTratamientoMain = 0;
     int clienteEncontrado = 0;
+    TDA_Cliente NuevoCliente;
 
     if (isfullC(*ListaDeCliente)) {
         printf("La lista de clientes está llena.\n");
@@ -190,16 +191,16 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
 
     printf("Ingrese por favor su Numero de documento para verificar si es o no Cliente: ");
     scanf("%d", &VerificacionDocumento);
-
-    for (int i = 0; i < ListaDeCliente->ultimo; i++) {
-        if (ListaDeCliente->data[i].IdClienteDNI == VerificacionDocumento) {
+    resetC(ListaDeCliente);
+    while(!isOosC(*ListaDeCliente)){
+        if (NuevoCliente.IdClienteDNI == VerificacionDocumento){
             clienteEncontrado = 1;
             break;
         }
+        forwardsC(ListaDeCliente);
     }
 
     if (clienteEncontrado != 1) {
-        TDA_Cliente NuevoCliente;
         printf("Usted no es cliente, vamos a proceder a la carga de cliente.\n");
         printf("__________________________________________________\n");
 
@@ -214,11 +215,21 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
         set_Apellido(&NuevoCliente, ApellidoMain);
 
         printf("Ingrese la cantidad de tratamientos: ");
-        scanf("%d", &CantidadTratamientoMain);
+        do {
+            scanf("%d", &CantidadTratamientoMain);
+            if (CantidadTratamientoMain > 4) {
+                printf("Error: No se pueden realizar más de 4 tratamientos en un turno.\nIngrese una cantidad válida (1-4): ");
+            }
+        } while (CantidadTratamientoMain < 1 || CantidadTratamientoMain > 4);
         set_CantidadTratamientoss(&NuevoCliente, CantidadTratamientoMain);
+        set_Nivel(&NuevoCliente);
 
+        resetC(ListaDeCliente);
         inserteC(ListaDeCliente, NuevoCliente);
+        forwardsC(ListaDeCliente);
         printf("Cliente agregado con exito.\n");
+    }else{
+        printf ("usted ya esta cargado como cliente procedemos a cargar turno\n");
     }
 
     float total = 0;
@@ -312,6 +323,7 @@ for (int i = 0; i < 10; i++) {
     } while (confirmacion != 'S' && confirmacion != 's' && confirmacion != 'N' && confirmacion != 'n');
 
     if (confirmacion == 'S' || confirmacion == 's') {
+        resert(ListaDeTurno);
         inserte(ListaDeTurno, NuevoTurno);
         printf("Guardado exitoso\n");
     } else {
@@ -709,7 +721,7 @@ void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
     resetC(ListaDeCliente);
     TDA_Cliente clienteActual;
 
-    while (!isOosC(*ListaDeCliente)) { 
+    while (!isOosC(*ListaDeCliente)) {
         clienteActual = copyyC(*ListaDeCliente);
 
         printf("DNI: %d\n", get_IdClientes(&clienteActual));
@@ -719,7 +731,7 @@ void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
         printf("El Nivel es: %d\n", get_Nivel(&clienteActual));
         printf("__________________________________________________\n");
 
-        forwardsC(ListaDeCliente); 
+        forwardsC(ListaDeCliente);
     }
 }
 ///Funcion "16" o).
@@ -734,12 +746,12 @@ void Eliminar_Cliente_sm_Turno (List_of_Cliente *listaCliente, List_of_Turno *li
         return;
     }
 
-    resetC(listaCliente); 
-    while (!isOosC(*listaCliente)) { 
+    resetC(listaCliente);
+    while (!isOosC(*listaCliente)) {
 
         if (busca_turno_idcliente(listaTurno, idClienteEliminar) == 1) {
-            supressC(listaCliente); 
-            break; 
+            supressC(listaCliente);
+            break;
         } else {
             forwardsC(listaCliente);
         }
