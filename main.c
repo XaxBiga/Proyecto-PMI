@@ -218,7 +218,7 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
         do {
             scanf("%d", &CantidadTratamientoMain);
             if (CantidadTratamientoMain > 4) {
-                printf("Error: No se pueden realizar más de 4 tratamientos en un turno.\nIngrese una cantidad válida (1-4): ");
+                printf("Error: No se pueden realizar mas de 4 tratamientos en un turno.\nIngrese una cantidad valida (1-4): ");
             }
         } while (CantidadTratamientoMain < 1 || CantidadTratamientoMain > 4);
         set_CantidadTratamientoss(&NuevoCliente, CantidadTratamientoMain);
