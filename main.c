@@ -55,11 +55,8 @@ int main (){
         scanf ("%d",&opcion);
         switch (opcion) {
             case 1:
-                resert(&ListaDeTurno);
-                resetC (&ListaDeCliente);
                 CargaDeUnTurno(&ListaDeTurno, &ListaDeCliente);
-                forwards(&ListaDeTurno);
-                forwardsC(&ListaDeCliente);
+
             break;
             case 2:
 
@@ -183,7 +180,7 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
     int CantidadTratamientoMain = 0;
     int clienteEncontrado = 0;
     TDA_Cliente NuevoCliente;
-
+    TDA_Turno NuevoTurno;
     if (isfullC(*ListaDeCliente)) {
         printf("La lista de clientes está llena.\n");
         return;
@@ -229,7 +226,7 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
         forwardsC(ListaDeCliente);
         printf("Cliente agregado con exito.\n");
     }else{
-        printf ("usted ya esta cargado como cliente procedemos a cargar turno\n");
+        printf("Usted ya está cargado como cliente. Procedemos a cargar el turno.\n");
     }
 
     float total = 0;
@@ -237,7 +234,6 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
     int FormaDePagoTurno;
     int DiaTurno, MesTurno, AnioTurno, HoraTurno;
 
-    TDA_Turno NuevoTurno;
     set_IdClientes(&NuevoTurno, VerificacionDocumento);
     set_Nombre(&NuevoTurno, NombreMain);
 
