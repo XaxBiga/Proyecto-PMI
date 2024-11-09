@@ -134,5 +134,4 @@ Fecha_Turno get_Fecha(TDA_Turno *t) {
     return (*t).Fechas_of_Turno;
 }
 
-
 #endif // TURNO_H_INCLUDED

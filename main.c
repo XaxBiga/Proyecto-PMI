@@ -1,12 +1,15 @@
 #include <complex.h>
 #include <stdio.h>
 #include <malloc.h>
+#include <stdlib.h>
 #include "listaE_Cliente.h"
 #include "Turno.h"
 #include "listaD_Turno.h"
 #include "Cliente.h"
 void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente);
+void carga_de_un_cliente_porDni(List_of_Cliente *ListaCliente, List_of_Turno *ListaDeTurno ,int DNI);
 void Buscar_si_cargarTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente, int id);
+int busca_turno_idcliente (List_of_Turno *l,int id);
 void MostrarTodosLosClienteNombre(List_of_Cliente *ListaDeCliente, char NombreBuscar[]);
 void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente);
 void MostrarTodosLosTurnosFecha(List_of_Turno listaD_Turno , int Mes);
@@ -21,6 +24,8 @@ void Eliminar_Cliente_sm_Turno (List_of_Cliente *listaCliente, List_of_Turno *li
 void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo);
 //void precargarClientesDesdeArchivo(List_of_Cliente *ListaDeCliente);
 void carga_de_un_cliente(List_of_Cliente *listaDeClientes) ;
+void GuardarTurnoCancelado(TDA_Turno TurnoAcancelar);
+void cancelarTurnoPorIdCliente (List_of_Turno *ListaDeTurno,int idbuscar);
 int main (){
 
     int opcion,Mes,IdCliente,Tipo;
@@ -55,11 +60,20 @@ int main (){
         scanf ("%d",&opcion);
         switch (opcion) {
             case 1:
+                resetC(&ListaDeCliente);
+                resert(&ListaDeTurno);
                 CargaDeUnTurno(&ListaDeTurno, &ListaDeCliente);
-
+                forwardsC(&ListaDeCliente);
             break;
             case 2:
-
+                printf ("ingrese un DNI para averiguar su estado del turno\n");
+                scanf ("%d",&idbuscar);
+                int valor = busca_turno_idcliente(&ListaDeTurno,idbuscar );
+                if (valor == 1){
+                    printf("Cliente encontrado con turno\n");
+                }else {
+                    printf ("Cliente sin Turno\n");
+                }
             break;
             case 3:
                 printf ("Para mostrarle todos los turnos mediante una fecha, el MES a ingresar: ");
@@ -131,12 +145,13 @@ int main (){
                 modificar_pago (&ListaDeTurno,ListaDeCliente ,idbuscar);
             break;
             case 10:
-
+                printf ("Ingrese por favol el DNI para eliminarlo: ");
+                scanf ("%d",&idbuscar);
+                cancelarTurnoPorIdCliente (&ListaDeTurno,idbuscar);
             break;
             case 11:
             break;
             case 12:
-                resetC(&ListaDeCliente);
                 carga_de_un_cliente(&ListaDeCliente);
             break;
             case 13:
@@ -148,6 +163,7 @@ int main (){
                 //precargarClientesDesdeArchivo(&ListaDeCliente);
             break;
             case 15:
+                resetC(&ListaDeCliente);
                 MostrarTodosLosClientesDeLaLista(&ListaDeCliente);
             break;
             case 16:
@@ -221,9 +237,7 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
         set_CantidadTratamientoss(&NuevoCliente, CantidadTratamientoMain);
         set_Nivel(&NuevoCliente);
 
-        resetC(ListaDeCliente);
         inserteC(ListaDeCliente, NuevoCliente);
-        forwardsC(ListaDeCliente);
         printf("Cliente agregado con exito.\n");
     }else{
         printf("Usted ya está cargado como cliente. Procedemos a cargar el turno.\n");
@@ -319,7 +333,6 @@ for (int i = 0; i < 10; i++) {
     } while (confirmacion != 'S' && confirmacion != 's' && confirmacion != 'N' && confirmacion != 'n');
 
     if (confirmacion == 'S' || confirmacion == 's') {
-        resert(ListaDeTurno);
         inserte(ListaDeTurno, NuevoTurno);
         printf("Guardado exitoso\n");
     } else {
@@ -332,7 +345,7 @@ for (int i = 0; i < 10; i++) {
 int busca_turno_idcliente (List_of_Turno *l,int id){
 
 if (isempty(*l)){
-  printf ("la lista esta vacia\n ");
+  printf ("la lista de cliente esta vacia\n ");
   return 0;
 }
 
@@ -592,7 +605,43 @@ void modificar_pago(List_of_Turno *l,List_of_Cliente c, int id) {
         forwards(l);
     }
 }
+///Funcion "10"J).
+void cancelarTurnoPorIdCliente (List_of_Turno *ListaTurno, int idClienteCancelar){
+    if (isOos(*ListaTurno)){
+        printf ("La lista con ese turno esta vacia\n");
+        return;
+    }
+    resert (ListaTurno);
+    while(!isOos(*ListaTurno)){
+        TDA_Turno TurnoAcancelar = Copyy(*ListaTurno);
+        if (TurnoAcancelar.IdCliente == idClienteCancelar){
+            GuardarTurnoCancelado(TurnoAcancelar);
+            supress(ListaTurno);
+            printf("Turno del cliente con ID %d ha sido cancelado y eliminado.\n", idClienteCancelar);
+            return;
+        }
+        forwards(ListaTurno);
+    }
+printf("No se encontró ningún turno para el cliente con ID %d.\n", idClienteCancelar);
+}
+//case 102b).
+void GuardarTurnoCancelado(TDA_Turno TurnoAcancelar){
+    FILE *Archivo = fopen ("Turno_Cancelado.txt", "a");
+    if(Archivo == NULL){
+        printf ("no se encontro cliente con ese Id\n");
+        return;
+    }
+    fprintf (Archivo, "Turno Cancelado\n");
+    fprintf (Archivo, "Nombre del cliente: %s\n",get_Nombre(TurnoAcancelar));
+    fprintf (Archivo, "El DNI del Cliente: %d\n",get_IdCliente(&TurnoAcancelar));
+    fprintf (Archivo, "El id Turno es: %d\n", get_IdTurno(&TurnoAcancelar));
+    //fprintf (Archivo, "El Total de los tratamientos: %f\n",get_Total(&TurnoAcancelar));
 
+
+    fclose(Archivo);
+
+}
+/// Funcion "11"k).
 
 ///Funcion "12"L).
 void carga_de_un_cliente(List_of_Cliente *listaDeClientes) {
@@ -706,15 +755,39 @@ void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo){
 
 }
 ///Funcion "14"n).
+/*void precargarClientesDesdeArchivo(List_of_Cliente *c) {
+   int dni;
+  char nom[31];
+  char ape[31];
+  int cantTratamientos;
 
+  FILE *fp;
+  fp = fopen ("cliente.txt","r");
+  if (fp == NULL){
+   exit(1);
+   }
+   rewind(fp);
+   TDA_Cliente cliente;
+   while (feof(fp)== 0){
+    fscanf (fp,"%d",&dni);
+    set_IdCliente(&cliente,cliente.IdClienteDNI);
+    fscanf(fp,"%s",cliente.Nombre);
+    set_Nombres(&cliente,nom);
+    fscanf (fp,"%s",cliente.Apellido);
+    set_Apellido(&cliente,ape);
+    fscanf (fp,"%d",&cliente.CantidadTratamiento);
+    //set_CantidadTratamientoss(&cliente,cantTratamientos);
+
+    fgetc(fp);
+    inserteC(c,cliente);
+
+   }
+}*/
 ///Funci�n "15").
 void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
-    if (isemptyC(*ListaDeCliente)) {
-        printf("No hay clientes en la lista.\n");
-        return;
+    if (isemptyC(*ListaDeCliente)){
+        printf ("La lista de cliente esta vacia\n");
     }
-
-    resetC(ListaDeCliente);
     TDA_Cliente clienteActual;
 
     while (!isOosC(*ListaDeCliente)) {
