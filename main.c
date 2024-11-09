@@ -17,12 +17,12 @@ void ModificarRalizadoTurno(List_of_Turno *ListaTurno,List_of_Cliente ListaClien
 void mostrar_turno_cliente(List_of_Turno t, List_of_Cliente c, char clbuscar[]);
 void ModificarLaCantidadTratamiento(List_of_Cliente *ListaDeCliente, int idClienteModificar);
 void busca_turnos (List_of_Turno ListaDeTurno,List_of_Cliente listaDeCliente, int idbuscar);
-void mostrar_todos_los_turnos (List_of_Turno *l);
+void mostrar_todos_los_turnos (List_of_Turno l);
 void modificar_pago (List_of_Turno *l,List_of_Cliente c,int id);
 void muestraTurnoDeNorealizados(List_of_Turno listaDeTurno);
 void Eliminar_Cliente_sm_Turno (List_of_Cliente *listaCliente, List_of_Turno *listaTurno,int idCLienteEliminar);
 void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo);
-//void precargarClientesDesdeArchivo(List_of_Cliente *ListaDeCliente);
+void precargarClientesDesdeArchivo(List_of_Cliente *ListaDeCliente);
 void carga_de_un_cliente(List_of_Cliente *listaDeClientes) ;
 void GuardarTurnoCancelado(TDA_Turno TurnoAcancelar);
 void cancelarTurnoPorIdCliente (List_of_Turno *ListaDeTurno,int idbuscar);
@@ -94,50 +94,17 @@ int main (){
             break;
             case 7:
                 printf ("Mostrando los turnos: \n");
-                mostrar_todos_los_turnos(&ListaDeTurno);
+                mostrar_todos_los_turnos(ListaDeTurno);
             break;
             case 8:
-            printf("Ingrese el DNI del cliente para la modificacion de la cantidad de tratamiento\n");
-            int ModCantTratamiento, CantidadTratamientoNuevo;
-            char confirmacion;
-            scanf("%d", &ModCantTratamiento);
-
-            if (isemptyC(ListaDeCliente)) {
-                printf("La lista esta vacia\n");
-                return 0;
-            }
-
-            resetC(&ListaDeCliente);
-
-            TDA_Cliente ClienteAux;
-            while (!isOosC(ListaDeCliente)) {
-                ClienteAux = copyyC(ListaDeCliente);
-
-                if (get_IdClientes(&ClienteAux) == ModCantTratamiento) {
-
-                    do {
-                        printf("¿Esta seguro que quiere realizar la modificacion de cantidad de tratamientos? (S/n): ");
-                        scanf(" %c", &confirmacion);
-                    } while (confirmacion != 'S' && confirmacion != 's' &&
-                            confirmacion != 'N' && confirmacion != 'n');
-
-                    if (confirmacion == 'S' || confirmacion == 's') {
-                        printf("Ingrese la cantidad de tratamientos que quiere modificar: ");
-                        scanf("%d", &CantidadTratamientoNuevo);
-                        set_CantidadTratamientoss(&ClienteAux, CantidadTratamientoNuevo);
-
-                        supressC(&ListaDeCliente);
-                        inserteC(&ListaDeCliente, ClienteAux);
-                        printf("Modificacion exitosa\n");
-                        break;
-                    } else {
-                        printf("Se nego la realizacion de la modificacion\n");
-                        break;
-                    }
+                if (isemptyC(ListaDeCliente)){
+                    printf ("la lista de cliente esta vacia\n");
+                    return 0;
                 }
-
-                forwardsC(&ListaDeCliente);
-            }
+                resetC(&ListaDeCliente);
+                printf ("ingrese el DNI del cliente a modificar\n");
+                scanf ("%d", &idbuscar);
+                ModificarLaCantidadTratamiento(&ListaDeCliente, idbuscar);
             break;
             case 9:
                 printf ("Ingrese porfavor el DNI para buscar para la modificacion de pago");
@@ -150,6 +117,7 @@ int main (){
                 cancelarTurnoPorIdCliente (&ListaDeTurno,idbuscar);
             break;
             case 11:
+
             break;
             case 12:
                 carga_de_un_cliente(&ListaDeCliente);
@@ -160,7 +128,7 @@ int main (){
                 mostrar_turno_por_tratamiento(&ListaDeTurno,Tipo);
             break;
             case 14:
-                //precargarClientesDesdeArchivo(&ListaDeCliente);
+                precargarClientesDesdeArchivo(&ListaDeCliente);
             break;
             case 15:
                 resetC(&ListaDeCliente);
@@ -260,7 +228,11 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
     }
 
     for (int i = 0; i < 10; i++) {
-       NuevoTurno.Tratamientos.TipoTratamiento [i]= 0;
+       NuevoTurno.Tratamientos.TipoTratamiento [i] = 0;
+    }
+    /// relleno todo el arreglo de formas de pago 0 al 4 (por los tipos de formas de pago)
+    for (int i = 0 ; i< 4 ; i++){
+        NuevoTurno.Pago_of_Turno.FormaDePago[i]= 0;
     }
 
     for (int i = 0; i < CantidadTratamientoMain; i++) {
@@ -291,10 +263,11 @@ for (int i = 0; i < 10; i++) {
     int tratamientoGuardado = get_Tratamiento(&NuevoTurno, i);
     printf("Lo que tiene guardado en la posicion %d es: %d\n", i, tratamientoGuardado);
 }
+
     do {
         printf("Ingrese la forma de pago que necesita: \n");
         printf("<1>. Qr.\n<2>. Debito.\n<3>. Credito.\n<4>. Efectivo.\n");
-        scanf("%d", &FormaDePagoTurno);
+        scanf("%d", &FormaDePagoTurno );
     } while (FormaDePagoTurno < 1 || FormaDePagoTurno > 4);
 
     do {
@@ -316,7 +289,10 @@ for (int i = 0; i < 10; i++) {
         total += get_precioTratamiento(&NuevoTurno, i);
     }
 
-    set_FormaDePago(&NuevoTurno, FormaDePagoTurno - 1);
+    set_FormaDePago(&NuevoTurno, FormaDePagoTurno );
+    for (int i=0;i<4;i++){
+        printf ("lo que tiene guardado en la posicion %d es: %d\n",i, get_FormaDepago(&NuevoTurno , i));
+    }
     set_FechaTurno(&NuevoTurno, DiaTurno, MesTurno, AnioTurno, HoraTurno);
     set_Realizado(&NuevoTurno, 0);
     set_TotalDepago(&NuevoTurno, total);
@@ -394,7 +370,7 @@ void MostrarTodosLosTurnosFecha(List_of_Turno ListaDeTurno, int Mes) {
             printf("Tratamientos:\n");
                 int tratamientoEncontrado = 0;
 
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i <= 10; i++) {
                     int tratamiento = get_Tratamiento(&TurnoActual, i);
                     if (tratamiento != 0) {
                         tratamientoEncontrado = 1;
@@ -409,11 +385,10 @@ void MostrarTodosLosTurnosFecha(List_of_Turno ListaDeTurno, int Mes) {
             // Imprimir forma de pago
             printf("Forma de pago:\n");
             int formaPagoEncontrada = 0;
-            for (int i = 0; i < 4; i++) {
-                int formaDePago = get_FormaDepago(&TurnoActual, i);
-                if (formaDePago == 1) {
+            for (int i = 0; i <= 4; i++) {
+                if (get_FormaDepago(&TurnoActual, i) != 0) {
                     formaPagoEncontrada = 1;
-                    printf("- Opción %d\n", formaDePago);
+                    printf("- Opción %d\n", get_FormaDepago(&TurnoActual, i));
                 }
             }
             if (!formaPagoEncontrada) {
@@ -434,45 +409,56 @@ void MostrarTodosLosTurnosFecha(List_of_Turno ListaDeTurno, int Mes) {
 void mostrar_turno_cliente(List_of_Turno t, List_of_Cliente c, char clbuscar[]) {
     int cpagina = 3;
     int count = 0;
-    int i;
 
     if (isemptyC(c)) {
-        printf("La lista de clientes esta vacia\n");
+        printf("La lista de clientes está vacía\n");
         return;
     }
 
     resetC(&c);
+    TDA_Cliente buscarCliente;
+    int encontrado = 0;
 
-    for (i = 0; i < c.ultimo; i++) {
-        if (strcmp(c.data[i].Nombre, clbuscar) == 0) {
-            int idcliente = c.data[i].IdClienteDNI;
+    while (!isOosC(c)) {
+        buscarCliente = copyyC(c);
+
+
+        if (strcmp(get_Nombres(&buscarCliente), clbuscar) == 0) {
+            encontrado = 1;
+            int idcliente = get_IdClientes(&buscarCliente);
+
+
             resert(&t);
-
             while (!isOos(t)) {
                 TDA_Turno buscaymuestra = Copyy(t);
 
+
                 if (buscaymuestra.IdCliente == idcliente) {
-                    printf("Cliente: %s\n", get_Nombre(buscaymuestra));
-                    printf("IDCliente: %d\n", get_IdCliente(&buscaymuestra));
+                    printf("Cliente: %s\n", get_Nombres(&buscarCliente));
+                    printf("IDCliente: %d\n", get_IdClientes(&buscarCliente));
                     printf("IDTurno: %d\n", get_IdTurno(&buscaymuestra));
-                    printf("¿Esta realizado?: %d\n", get_realizado(&buscaymuestra));
+                    printf("¿Está realizado?: %d\n", get_realizado(&buscaymuestra));
                     printf("\n");
 
                     count++;
 
                     if (count % cpagina == 0) {
-                        printf("Presione Enter para continuar...");
+                        printf("Presione Enter para continuar a la siguiente página...");
                         getchar();
                     }
                 }
-
                 forwards(&t);
             }
+            break;
         }
+
+        forwardsC(&c);
     }
 
-    if (count == 0) {
-        printf("No se encontraron turnos para el cliente\n");
+    if (!encontrado) {
+        printf("No se encontró el cliente con el nombre '%s'.\n", clbuscar);
+    } else if (count == 0) {
+        printf("No se encontraron turnos para el cliente '%s'.\n", clbuscar);
     }
 }
 ///Funci�n "5").
@@ -481,11 +467,7 @@ void busca_turnos(List_of_Turno t,List_of_Cliente c ,int idbuscar){
         printf ("No hay cliente cargados\n");
     return ;
  }
- if (isempty(t)){
-        printf ("La lista esta vacia\n");
-  return;
- }
-        TDA_Turno TurnoR = Copyy(t);
+       TDA_Turno TurnoR = Copyy(t);
     if(TurnoR.IdCliente == idbuscar){
         printf("Cliente :%s \n",get_Nombre(TurnoR));
         /// Falta poner mas cosas del campo "Turno".
@@ -519,16 +501,16 @@ void busca_turnos(List_of_Turno t,List_of_Cliente c ,int idbuscar){
 }*/
 
 ///Funcion "7" g).
-void mostrar_todos_los_turnos (List_of_Turno *l){
+void mostrar_todos_los_turnos (List_of_Turno l){
 
-  if (isempty(*l) == 1){
+  if (isempty(l) == 1){
    printf ("no hay ningun turno cargado \n");
   return;
   }
 
-  resert(l);
-  while (!isOos(*l)){
-    TDA_Turno TurnoActual = Copyy(*l);
+  resert(&l);
+  while (!isOos(l)){
+    TDA_Turno TurnoActual = Copyy(l);
 
             printf("=======================================\n");
             printf("       Detalles del Turno Cliente:      \n");
@@ -546,7 +528,7 @@ void mostrar_todos_los_turnos (List_of_Turno *l){
             printf("=======================================\n");
 
             printf("Tratamientos:\n");
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i <= 10; i++) {
                 int tratamiento = get_Tratamiento(&TurnoActual, i);
                 if (tratamiento != 0) {
                     printf("- Tratamiento %d\n", tratamiento);
@@ -554,7 +536,7 @@ void mostrar_todos_los_turnos (List_of_Turno *l){
             }
 
             printf("Formas de Pago:\n");
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i <= 4; i++) {
                 int formaDePago = get_FormaDepago(&TurnoActual, i);
                 if (formaDePago != 0) {
                     printf("- Forma de pago %d\n", formaDePago);
@@ -568,12 +550,49 @@ void mostrar_todos_los_turnos (List_of_Turno *l){
                 printf("No Realizado\n");
             }
 
-        forwards(l);
+        forwards(&l);
            }
 
 
       }
+/// Funcion "8"H).
+void ModificarLaCantidadTratamiento(List_of_Cliente *ListaDeCliente,int ModCantTratamiento){
+    if (isemptyC(*ListaDeCliente)){
+         printf ("la lista de cliente esta vacia\n");
+       return ;
+    }
+    char confirmacion;
+    int CantidadTratamientoNuevo;
+            TDA_Cliente ClienteAux;
+            while (!isOosC(*ListaDeCliente)) {
+                ClienteAux = copyyC(*ListaDeCliente);
 
+                if (get_IdClientes(&ClienteAux) == ModCantTratamiento) {
+
+                    do {
+                        printf("¿Esta seguro que quiere realizar la modificacion de cantidad de tratamientos? (S/n): ");
+                        scanf(" %c", &confirmacion);
+                    } while (confirmacion != 'S' && confirmacion != 's' &&
+                            confirmacion != 'N' && confirmacion != 'n');
+
+                    if (confirmacion == 'S' || confirmacion == 's') {
+                        printf("Ingrese la cantidad de tratamientos que quiere modificar: ");
+                        scanf("%d", &CantidadTratamientoNuevo);
+                        set_CantidadTratamientoss(&ClienteAux, CantidadTratamientoNuevo);
+
+                        supressC(ListaDeCliente);
+                        inserteC(ListaDeCliente, ClienteAux);
+                        printf("Modificacion exitosa\n");
+                        break;
+                    } else {
+                        printf("Se nego la realizacion de la modificacion\n");
+                        break;
+                    }
+                }
+
+                forwardsC(ListaDeCliente);
+            }
+    }
 /// Función "9"I).
 void modificar_pago(List_of_Turno *l,List_of_Cliente c, int id) {
     int nuevopago;
@@ -755,11 +774,10 @@ void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo){
 
 }
 ///Funcion "14"n).
-/*void precargarClientesDesdeArchivo(List_of_Cliente *c) {
+void precargarClientesDesdeArchivo(List_of_Cliente *c) {
    int dni;
   char nom[31];
   char ape[31];
-  int cantTratamientos;
 
   FILE *fp;
   fp = fopen ("cliente.txt","r");
@@ -782,7 +800,7 @@ void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo){
     inserteC(c,cliente);
 
    }
-}*/
+}
 ///Funci�n "15").
 void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
     if (isemptyC(*ListaDeCliente)){

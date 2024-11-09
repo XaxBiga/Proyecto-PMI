@@ -44,26 +44,23 @@ void set_IdClientes(TDA_Turno *t, int IdClienteNuevos) {
 }
 
 void set_Tratamiento(TDA_Turno *t,int tratamientosSeleccionados) {
-
-    for (int i = 0; i < 10; i++) {
-        int tipoTratamiento = tratamientosSeleccionados;
-        if (tipoTratamiento == i) {
-            t->Tratamientos.TipoTratamiento[tipoTratamiento - 1] = tratamientosSeleccionados;
+    for (int i = 0; i <= 10; i++) {
+        if (tratamientosSeleccionados == i) {
+            t->Tratamientos.TipoTratamiento[tratamientosSeleccionados - 1] = tratamientosSeleccionados;
         }
     }
 }
 void set_PrecioTratamiento(TDA_Turno *t, int index, float PrecioTratamientoNuevo) {
-    if (index >= 0 && index < 10) { // Verificar el �ndice
-        (*t).Tratamientos.Precio_Tratamiento[index] = PrecioTratamientoNuevo; // Solo actualizar el tratamiento seleccionado
+    if (index >= 0 && index < 10) {
+        (*t).Tratamientos.Precio_Tratamiento[index] = PrecioTratamientoNuevo;
     }
 }
 
 void set_FormaDePago(TDA_Turno *t, int TipoDepagoNuevo) {
-    if (TipoDepagoNuevo >= 0 && TipoDepagoNuevo < 4) {
-        for (int i = 0; i <= 4; i++) {
-            t->Pago_of_Turno.FormaDePago[i] = 0;
+    for (int i=0; i<=4; i++){
+        if (TipoDepagoNuevo == i){
+            t->Pago_of_Turno.FormaDePago[TipoDepagoNuevo - 1] = TipoDepagoNuevo;
         }
-        t->Pago_of_Turno.FormaDePago[TipoDepagoNuevo] = TipoDepagoNuevo+1;
     }
 }
 

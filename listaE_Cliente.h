@@ -16,7 +16,7 @@ void init_lC(List_of_Cliente *l) {
 }
 
 int isemptyC(List_of_Cliente l) {
-    return l.ultimo == 0;
+    return l.ultimo == -1;
 }
 
 int isfullC(List_of_Cliente l) {
