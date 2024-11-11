@@ -135,6 +135,7 @@ int main (){
                 MostrarTodosLosClientesDeLaLista(&ListaDeCliente);
             break;
             case 16:
+                resetC(&ListaDeCliente);
                 printf ("ingrese el DNI del cliente que quiere eliminar\n");
                 scanf ("%d",&idbuscar);
                 Eliminar_Cliente_sm_Turno (&ListaDeCliente, &ListaDeTurno , idbuscar);
@@ -158,58 +159,75 @@ int main (){
     return 0;
 }
 void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente) {
-    int VerificacionDocumento;
     char NombreMain[31];
     char ApellidoMain[31];
-    int CantidadTratamientoMain = 0;
+    int VerificacionDocumento;
     int clienteEncontrado = 0;
     TDA_Cliente NuevoCliente;
     TDA_Turno NuevoTurno;
+    int turnoPendiente = 0;
+
+
     if (isfullC(*ListaDeCliente)) {
         printf("La lista de clientes está llena.\n");
         return;
     }
 
+
     printf("Ingrese por favor su Numero de documento para verificar si es o no Cliente: ");
     scanf("%d", &VerificacionDocumento);
+
+
     resetC(ListaDeCliente);
-    while(!isOosC(*ListaDeCliente)){
-        if (NuevoCliente.IdClienteDNI == VerificacionDocumento){
+    while (!isOosC(*ListaDeCliente)) {
+        TDA_Cliente c = copyyC(*ListaDeCliente);
+        if (c.IdClienteDNI == VerificacionDocumento) {
             clienteEncontrado = 1;
+            NuevoCliente = c;
             break;
         }
         forwardsC(ListaDeCliente);
     }
 
-    if (clienteEncontrado != 1) {
+    // Cargar al cliente si no existe
+    if (!clienteEncontrado) {
         printf("Usted no es cliente, vamos a proceder a la carga de cliente.\n");
-        printf("__________________________________________________\n");
 
         set_IdCliente(&NuevoCliente, VerificacionDocumento);
-
         printf("Ingrese el Nombre: ");
         scanf("%s", NombreMain);
-        set_Nombres(&NuevoCliente, NombreMain);
-
+        set_Nombres(&NuevoCliente,NombreMain);
         printf("Ingrese el Apellido: ");
         scanf("%s", ApellidoMain);
-        set_Apellido(&NuevoCliente, ApellidoMain);
+        set_Apellido(&NuevoCliente,ApellidoMain);
 
-        printf("Ingrese la cantidad de tratamientos: ");
-        do {
-            scanf("%d", &CantidadTratamientoMain);
-            if (CantidadTratamientoMain > 4) {
-                printf("Error: No se pueden realizar mas de 4 tratamientos en un turno.\nIngrese una cantidad valida (1-4): ");
-            }
-        } while (CantidadTratamientoMain < 1 || CantidadTratamientoMain > 4);
-        set_CantidadTratamientoss(&NuevoCliente, CantidadTratamientoMain);
+
         set_Nivel(&NuevoCliente);
 
+
+        resetC(ListaDeCliente);
         inserteC(ListaDeCliente, NuevoCliente);
-        printf("Cliente agregado con exito.\n");
-    }else{
-        printf("Usted ya está cargado como cliente. Procedemos a cargar el turno.\n");
+        printf("Cliente agregado con éxito.\n");
+    }else {
+      resert(ListaDeTurno);
+      TDA_Turno t;
+
+
+      while (!isOos(*ListaDeTurno)){
+        t = Copyy(*ListaDeTurno);
+        if(t.Idturno == VerificacionDocumento && !t.Realizado){
+             turnoPendiente = 1;
+             break;
+        }
+       forwards(ListaDeTurno);
     }
+}
+    if (turnoPendiente) {
+            printf("Ya tiene un turno no realizado. No puede agendar otro hasta que se complete el actual.\n");
+            return;
+        } else {
+            printf("Cliente ya registrado. Procediendo a cargar el turno.\n");
+        }
 
     float total = 0;
     char confirmacion;
@@ -217,59 +235,63 @@ void CargaDeUnTurno(List_of_Turno *ListaDeTurno, List_of_Cliente *ListaDeCliente
     int DiaTurno, MesTurno, AnioTurno, HoraTurno;
 
     set_IdClientes(&NuevoTurno, VerificacionDocumento);
-    set_Nombre(&NuevoTurno, NombreMain);
 
-    // Cargar tratamientos y precios
+    // Inicializar tratamientos con 0 (no seleccionado) y cargar precios
     int TipoDeTratamiento;
     float precios[] = {100.0, 150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0, 500.0, 550.0};
 
     for (int i = 0; i < 10; i++) {
+        NuevoTurno.Tratamientos.TipoTratamiento[i] = 0;
         NuevoTurno.Tratamientos.Precio_Tratamiento[i] = precios[i];
     }
 
-    for (int i = 0; i < 10; i++) {
-       NuevoTurno.Tratamientos.TipoTratamiento [i] = 0;
-    }
-    /// relleno todo el arreglo de formas de pago 0 al 4 (por los tipos de formas de pago)
-    for (int i = 0 ; i< 4 ; i++){
-        NuevoTurno.Pago_of_Turno.FormaDePago[i]= 0;
-    }
-
-    for (int i = 0; i < CantidadTratamientoMain; i++) {
-    do {
-        printf("Ingrese el tipo de tratamiento (1-10): \n");
+    // Solicitar selección de tratamientos y calcular el total
+    printf("Seleccione los tratamientos que desea realizar (máximo de 4). Ingrese '0' para terminar:\n");
+    for (int i = 0; i < 4; i++) {
+        printf("Seleccione el tratamiento (1-10) o ingrese '0' para finalizar la selección:\n");
         for (int k = 1; k <= 10; k++) {
             printf("<%d>. Tratamiento %d (%.2f).\n", k, k, precios[k - 1]);
         }
+        scanf("%d", &TipoDeTratamiento);
 
-        if (scanf("%d", &TipoDeTratamiento) != 1) {
-            printf("Entrada inválida. Debe ingresar un número.\n");
-            while(getchar() != '\n');
+        // Finalizar selección si el usuario ingresa '0'
+        if (TipoDeTratamiento == 0) break;
+
+        // Validar la selección
+        if (TipoDeTratamiento < 1 || TipoDeTratamiento > 10) {
+            printf("El tipo de tratamiento debe estar entre 1 y 10.\n");
+            i--; // Permitir al usuario volver a elegir
             continue;
         }
 
-        if (TipoDeTratamiento < 1 || TipoDeTratamiento > 10) {
-            printf("El tipo de tratamiento debe estar entre 1 y 10.\n");
-            continue;  // Volver a pedir la entrada
+        // Asignar el tratamiento y su precio
+        NuevoTurno.Tratamientos.TipoTratamiento[TipoDeTratamiento - 1] = 1; // Marcar el tratamiento como seleccionado
+        total += precios[TipoDeTratamiento - 1]; // Sumar el precio al total
+    }
+
+    // Establecer el total a pagar en el turno
+    set_TotalDepago(&NuevoTurno, total);
+
+    // Mostrar detalles de la selección de tratamientos
+    printf("============================\n");
+    printf("Tratamientos seleccionados:\n");
+    for (int i = 0; i < 10; i++) {
+        if (NuevoTurno.Tratamientos.TipoTratamiento[i] == 1) {
+            printf("Tratamiento %d - Precio: %.2f\n", i + 1, precios[i]);
         }
-        set_Tratamiento(&NuevoTurno, TipoDeTratamiento);
-        set_PrecioTratamiento(&NuevoTurno, i, precios[TipoDeTratamiento - 1]);
+    }
+    printf("============================\n");
+    printf("El total SIN Descuento es: %.2f\n", get_Total(&NuevoTurno));
+    printf("============================\n");
 
-    } while (TipoDeTratamiento < 1 || TipoDeTratamiento > 10);
-}
-
-// Imprimir los tratamientos guardados
-for (int i = 0; i < 10; i++) {
-    int tratamientoGuardado = get_Tratamiento(&NuevoTurno, i);
-    printf("Lo que tiene guardado en la posicion %d es: %d\n", i, tratamientoGuardado);
-}
-
+    // Solicitar forma de pago
     do {
         printf("Ingrese la forma de pago que necesita: \n");
         printf("<1>. Qr.\n<2>. Debito.\n<3>. Credito.\n<4>. Efectivo.\n");
-        scanf("%d", &FormaDePagoTurno );
+        scanf("%d", &FormaDePagoTurno);
     } while (FormaDePagoTurno < 1 || FormaDePagoTurno > 4);
 
+    // Solicitar fecha y hora del turno
     do {
         printf("Ingrese la fecha del turno (01/11/2024 - 31/12/2024 entre 9:00 y 20:00):\n");
         printf("Dia: ");
@@ -284,38 +306,25 @@ for (int i = 0; i < 10; i++) {
              (MesTurno == 11 && DiaTurno < 1) || (MesTurno == 12 && DiaTurno > 31) ||
              HoraTurno < 9 || HoraTurno > 20);
 
-    total = 0;
-    for (int i = 0; i < CantidadTratamientoMain; i++) {
-        total += get_precioTratamiento(&NuevoTurno, i);
-    }
-
-    set_FormaDePago(&NuevoTurno, FormaDePagoTurno );
-    for (int i=0;i<4;i++){
-        printf ("lo que tiene guardado en la posicion %d es: %d\n",i, get_FormaDepago(&NuevoTurno , i));
-    }
+    set_FormaDePago(&NuevoTurno, FormaDePagoTurno - 1);
     set_FechaTurno(&NuevoTurno, DiaTurno, MesTurno, AnioTurno, HoraTurno);
     set_Realizado(&NuevoTurno, 0);
-    set_TotalDepago(&NuevoTurno, total);
+    set_Nombre(&NuevoTurno,NombreMain);
 
-    printf("La forma de pago es: %d\n", get_FormaDepago(&NuevoTurno, FormaDePagoTurno - 1));
-    printf("La fecha del turno es: %d/%d/%d a las %d hs\n", NuevoTurno.Fechas_of_Turno.Dia, NuevoTurno.Fechas_of_Turno.Mes, NuevoTurno.Fechas_of_Turno.Anio, NuevoTurno.Fechas_of_Turno.Hora);
-    printf("============================\n");
-    printf("El total SIN Descuento es: %.2f\n", get_Total(&NuevoTurno));
-    printf("============================\n");
-
+    // Confirmación del turno
     do {
         printf("Para la confirmacion: (S/n) ");
         scanf(" %c", &confirmacion);
     } while (confirmacion != 'S' && confirmacion != 's' && confirmacion != 'N' && confirmacion != 'n');
 
     if (confirmacion == 'S' || confirmacion == 's') {
+        resert(ListaDeTurno);
         inserte(ListaDeTurno, NuevoTurno);
         printf("Guardado exitoso\n");
     } else {
         printf("Turno Cancelado\n");
     }
 }
-
 ///Funcion "2" b).
 
 int busca_turno_idcliente (List_of_Turno *l,int id){
@@ -775,31 +784,39 @@ void mostrar_turno_por_tratamiento (List_of_Turno *l,int tipo){
 }
 ///Funcion "14"n).
 void precargarClientesDesdeArchivo(List_of_Cliente *c) {
-   int dni;
-  char nom[31];
-  char ape[31];
+    int dni, cantTratamientos, nivel;
+    char nom[31], ape[31];
 
-  FILE *fp;
-  fp = fopen ("cliente.txt","r");
-  if (fp == NULL){
-   exit(1);
-   }
-   rewind(fp);
-   TDA_Cliente cliente;
-   while (feof(fp)== 0){
-    fscanf (fp,"%d",&dni);
-    set_IdCliente(&cliente,cliente.IdClienteDNI);
-    fscanf(fp,"%s",cliente.Nombre);
-    set_Nombres(&cliente,nom);
-    fscanf (fp,"%s",cliente.Apellido);
-    set_Apellido(&cliente,ape);
-    fscanf (fp,"%d",&cliente.CantidadTratamiento);
-    //set_CantidadTratamientoss(&cliente,cantTratamientos);
+    FILE *fp = fopen("Cliente.txt", "r");
+    if (fp == NULL) {
+        printf("Error al abrir el archivo.\n");
+        exit(1);
+    }
 
-    fgetc(fp);
-    inserteC(c,cliente);
+    TDA_Cliente cliente;
 
-   }
+    // Bucle para leer cada cliente hasta el fin del archivo
+    rewind(fp);
+    while (fscanf(fp, "%d %s %s %d %d", &dni, nom, ape, &cantTratamientos, &nivel) == 5) {
+        // Asignar valores al cliente usando setters
+        set_IdCliente(&cliente, dni);
+        set_Nombres(&cliente, nom);
+        set_Apellido(&cliente, ape);
+        set_CantidadTratamientoss(&cliente, cantTratamientos);
+        set_Nivel(&cliente);  // Ajusta el nivel en base a los tratamientos
+
+        // Insertar cliente en la lista
+        if (!isfullC(*c)) {
+            inserteC(c, cliente);
+            forwardsC(c);
+        } else {
+            printf("La lista de clientes está llena. No se pueden agregar más clientes.\n");
+            break;
+        }
+    }
+
+    fclose(fp);
+    printf("Clientes precargados desde el archivo 'Cliente.txt' exitosamente.\n");
 }
 ///Funci�n "15").
 void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
@@ -823,17 +840,10 @@ void MostrarTodosLosClientesDeLaLista(List_of_Cliente *ListaDeCliente) {
 }
 ///Funcion "16" o).
 void Eliminar_Cliente_sm_Turno (List_of_Cliente *listaCliente, List_of_Turno *listaTurno, int idClienteEliminar){
-    if (isempty(*listaTurno)) {
-        printf("La lista de turnos está vacía.\n");
-        return;
-    }
-
     if (isemptyC(*listaCliente)) {
         printf("La lista de clientes está vacía.\n");
         return;
     }
-
-    resetC(listaCliente);
     while (!isOosC(*listaCliente)) {
 
         if (busca_turno_idcliente(listaTurno, idClienteEliminar) == 1) {

@@ -1,0 +1,8 @@
+Turno Cancelado
+Nombre del cliente: gabiel
+El DNI del Cliente: 2
+El id Turno es: 0
+Turno Cancelado
+Nombre del cliente: paloma
+El DNI del Cliente: 4
+El id Turno es: 0
